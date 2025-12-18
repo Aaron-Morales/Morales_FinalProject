@@ -1,0 +1,48 @@
+<%- include("_header") -%>
+
+    <h1>Customer Import</h1>
+
+    <p>
+        <strong>Total records in database:</strong>
+        <%= totalRecords %>
+    </p>
+
+    <% if (error) { %>
+        <p style="color:red;">
+            <%= error %>
+        </p>
+        <% } %>
+
+            <form action="/import" method="POST" enctype="multipart/form-data">
+                <input type="file" name="customerFile" />
+                <button type="submit">Import</button>
+            </form>
+
+            <p style="color:blue;">Wait for results...</p>
+
+            <% if (summary) { %>
+                <h3>Import Summary</h3>
+                <ul>
+                    <li>Total records processed: <%= summary.processed %>
+                    </li>
+                    <li>Records inserted successfully: <%= summary.inserted %>
+                    </li>
+                    <li>Records not inserted: <%= summary.failed %>
+                    </li>
+                </ul>
+
+                <% if (summary.errors.length> 0) { %>
+                    <h4>Error Details</h4>
+                    <ul>
+                        <% summary.errors.forEach(err=> { %>
+                            <li>
+                                <strong>
+                                    <%= err.record.email %>
+                                </strong> — <%= err.message %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <% } %>
+                        <% } %>
+
+<%- include("_footer") -%>

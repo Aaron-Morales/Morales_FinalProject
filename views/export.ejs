@@ -1,0 +1,19 @@
+<%- include("_header") %>
+
+    <h1>Customer Export</h1>
+
+    <p>
+        <strong>Total records in database:</strong>
+        <%= totalRecords %>
+    </p>
+
+    <form method="POST" action="/export">
+        <label for="filename">Filename:</label>
+        <input type="text" id="filename" name="filename" value="<%= defaultFilename %>" />
+
+        <br><br>
+
+        <button type="submit">Export Customers</button>
+    </form>
+
+    <%- include("_footer") %>
