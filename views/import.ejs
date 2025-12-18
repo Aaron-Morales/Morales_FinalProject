@@ -1,48 +1,34 @@
 <%- include("_header") -%>
 
     <h1>Customer Import</h1>
+    <h2>Total number of records in database: <%= totalRecords %></h2>
+    <h2>Select a file with customer Database Insertion</h2>
 
-    <p>
-        <strong>Total records in database:</strong>
-        <%= totalRecords %>
-    </p>
+    <form>  
+        <input type="file" name="customerFile" required><p></p>
+        <input type="submit">
+    </form>
+    <p id="result"></p>
 
-    <% if (error) { %>
-        <p style="color:red;">
-            <%= error %>
-        </p>
-        <% } %>
+    <script>
+        document.querySelector("form").addEventListener("submit", e=>{
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            fetch("/import", {
+                method: "POST",
+                body: formData
+            }).then(res=>res.text())
+            .then(data=>{
+                const resultElement = document.getElementById("result");
+                if(data.substring(0,5) === "Error"){
+                    resultElement.innerText = `Error occurred! ${data}`;
+                } else {
+                    resultElement.innerText = data;
+                };
+            }).catch(err=>{ 
+                document.getElementById("message").textContent = `Error: ${err.message}`;
+            });
+        });
+    </script>
 
-            <form action="/import" method="POST" enctype="multipart/form-data">
-                <input type="file" name="customerFile" />
-                <button type="submit">Import</button>
-            </form>
-
-            <p style="color:blue;">Wait for results...</p>
-
-            <% if (summary) { %>
-                <h3>Import Summary</h3>
-                <ul>
-                    <li>Total records processed: <%= summary.processed %>
-                    </li>
-                    <li>Records inserted successfully: <%= summary.inserted %>
-                    </li>
-                    <li>Records not inserted: <%= summary.failed %>
-                    </li>
-                </ul>
-
-                <% if (summary.errors.length> 0) { %>
-                    <h4>Error Details</h4>
-                    <ul>
-                        <% summary.errors.forEach(err=> { %>
-                            <li>
-                                <strong>
-                                    <%= err.record.email %>
-                                </strong> — <%= err.message %>
-                            </li>
-                            <% }) %>
-                    </ul>
-                    <% } %>
-                        <% } %>
-
-<%- include("_footer") -%>
+    <%- include("_footer") -%>
