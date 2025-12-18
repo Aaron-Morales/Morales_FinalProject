@@ -20,20 +20,18 @@ app.use(express.json());
 // File upload config
 const upload = multer({ dest: "uploads/" });
 
-// Database connection
-const connectionString =
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:password@localhost:5432/morales_finalproject_db";
-
+// Add database package and connection string (can remove ssl)
+const { Client } = require('pg');
 const client = new Client({
-    connectionString,
-    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    max: 2
 });
 
 client
     .connect()
-    .then(() => console.log("✅ Connected to database"))
-    .catch(err => console.error("❌ DB connection error:", err));
+    .then(() => console.log("Connected to database"))
+    .catch(err => console.error("DB connection error:", err));
 
 
 function parseFile(filePath) {
@@ -49,7 +47,7 @@ function parseFile(filePath) {
 
 // Starting the server
 app.listen(3000, () => {
-  console.log("Server started (http://localhost:3000/) !");
+    console.log("Server started (http://localhost:3000/) !");
 });
 
 
