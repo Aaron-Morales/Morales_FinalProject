@@ -1,16 +1,28 @@
-<%- include("_header") %>
+<%- include("_header") -%>
 
-    <main>
-        <h1>Customer Export</h1>
-        <h2>Total Records in the Database: <%= totalRecords %></h2>
-        <h2>Enter a file name and click "Export Customers"</h2>
+<div class="container">
+    <h1>Customer Export</h1>
+    
+    <h3>Total records in the database: <%= totalRecords %></h3>
+    
+    <p>Enter a file name and click "Export Customers"</p>
 
-       <form action="/export" method="post">
-            <input type="submit" id=" submit" value="Download">
-       </form>
-       <% if(message.substring(0,5) === 'Error') { %>
+    <form action="/export" method="POST">
+        <div class="mb-3 w-50">
+            <label for="filename">File Name:</label>
+            <input type="text" name="filename" id="filename" 
+                   value="export.txt" class="form-control" required>
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Export Customers">
+    </form>
+
+    <% if (message && message.includes('Error')) { %>
+        <div class="alert alert-danger mt-3">
             <h2>Error!</h2>
             <p><%= message %></p>
-         <% } %>
+        </div>
+    <% } %>
+</div>
 
-    <%- include("_footer") %>
+<%- include("_footer") -%>

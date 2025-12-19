@@ -1,0 +1,23 @@
+<%- include("_header") -%>
+
+<div class="container">
+    <h1>Import Summary</h1>
+    <table class="table table-bordered w-50">
+        <tr><th>Total records processed:</th><td><%= total %></td></tr>
+        <tr><th class="text-success">Records inserted successfully:</th><td><%= success %></td></tr>
+        <tr><th class="text-danger">Records not inserted:</th><td><%= failed %></td></tr>
+    </table>
+
+    <% if (errorDetails.length > 0) { %>
+        <h3>Error Details:</h3>
+        <ul class="text-danger">
+            <% errorDetails.forEach(error => { %>
+                <li><%= error %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+
+    <a href="/manageCustomers" class="btn btn-primary">Go to Manage Customers</a>
+</div>
+
+<%- include("_footer") -%>

@@ -1,34 +1,30 @@
 <%- include("_header") -%>
 
-    <h1>Customer Import</h1>
-    <h2>Total number of records in database: <%= totalRecords %></h2>
-    <h2>Select a file with customer Database Insertion</h2>
+<div class="container">
+    <h1>Import Customers</h1>
+    <p><strong>Total records in database:</strong> <%= totalRecords %></p>
 
-    <form>  
-        <input type="file" name="customerFile" required><p></p>
-        <input type="submit">
+    <form action="/import" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="customerFile" class="form-label">Select a file for Database Insertion</label>
+            <input type="file" name="customerFile" id="customerFile" class="form-control" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" onclick="showWait()">Import Customers</button>
     </form>
-    <p id="result"></p>
 
-    <script>
-        document.querySelector("form").addEventListener("submit", e=>{
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            fetch("/import", {
-                method: "POST",
-                body: formData
-            }).then(res=>res.text())
-            .then(data=>{
-                const resultElement = document.getElementById("result");
-                if(data.substring(0,5) === "Error"){
-                    resultElement.innerText = `Error occurred! ${data}`;
-                } else {
-                    resultElement.innerText = data;
-                };
-            }).catch(err=>{ 
-                document.getElementById("message").textContent = `Error: ${err.message}`;
-            });
-        });
-    </script>
+    <p id="waitMessage" style="display:none;" class="mt-3 text-info">
+        Please wait for results... processing records.
+    </p>
+</div>
 
-    <%- include("_footer") -%>
+<script>
+    function showWait() {
+        const fileInput = document.getElementById('customerFile');
+        if (fileInput.files.length > 0) {
+            document.getElementById('waitMessage').style.display = 'block';
+        }
+    }
+</script>
+
+<%- include("_footer") -%>

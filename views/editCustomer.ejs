@@ -1,0 +1,57 @@
+<%- include("_header") -%>
+
+<div class="container">
+    <h1>Edit Customer</h1>
+
+    <% if (message) { %>
+        <div class="alert <%= message.includes('success') ? 'alert-success' : 'alert-danger' %>">
+            <%= message %>
+        </div>
+    <% } %>
+
+    <form action="/editCustomer/<%= customer.custid %>" method="POST">
+        <div class="row mb-3">
+            <div class="col">
+                <label for="custid">ID (Read Only):</label>
+                <input type="text" id="custid" name="custid" class="form-control" 
+                       value="<%= customer.custid %>" readonly>
+            </div>
+            <div class="col">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" class="form-control" 
+                       value="<%= customer.firstname %>" required>
+            </div>
+            <div class="col">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" 
+                       value="<%= customer.lastname %>" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" class="form-control" 
+                       maxlength="2" pattern="[A-Za-z]{2}" 
+                       value="<%= customer.state %>">
+            </div>
+            <div class="col">
+                <label for="salesYTD">Sales YTD:</label>
+                <input type="number" step="0.01" id="salesYTD" name="salesYTD" class="form-control" 
+                       value="<%= customer.salesytd %>">
+            </div>
+            <div class="col">
+                <label for="prevSales">Previous Years Sales:</label>
+                <input type="number" step="0.01" id="prevSales" name="prevSales" class="form-control" 
+                       value="<%= customer.previousyearssales %>">
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Update Customer</button>
+            <a href="/manageCustomers" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+<%- include("_footer") -%>
