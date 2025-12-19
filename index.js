@@ -12,11 +12,11 @@ const upload = multer();
 require("dotenv").config();
 
 // Database Pool Setup
-const { Pool } = require("pg"); 
+const { Pool } = require("pg");
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { 
-    rejectUnauthorized: false 
+    ssl: {
+        rejectUnauthorized: false
     },
     max: 2
 });
@@ -28,37 +28,40 @@ const getTotalCount = async () => {
 
 // Get Requests
 app.get("/", (req, res) => {
-  const sql = "SELECT * FROM CUSTOMER ORDER BY custId";
-  pool.query(sql, [], (err, result) => {
-    if (err) {
-        return res.render("index", { 
-        message: "Error: " + err.message, 
-        model: [], 
-        totalRecords: 0 
-      });
-    }
+    const sql = "SELECT * FROM CUSTOMER ORDER BY custId";
+    pool.query(sql, [], (err, result) => {
+        if (err) {
+            return res.render("index", {
+                message: "Error: " + err.message,
+                model: [],
+                totalRecords: 0
+            });
+        }
 
-    res.render("index", {
-      message: "success",
-      model: result.rows,
-      totalRecords: result.rows.length 
+        const totalRecords = result.rows;
+        const total = totalRecords.length;
+
+        res.render("index", {
+            message: "success",
+            model: totalRecords,
+            totalRecords: total
+        });
     });
-  });
 });
 
 app.get("/manageCustomers", async (req, res) => {
     const totalRecords = await getTotalCount();
-    res.render("manageCustomers", { 
-        message: "", 
-        model: [], 
+    res.render("manageCustomers", {
+        message: "",
+        model: [],
         totalRecords: totalRecords,
-        searchCriteria: {} 
+        searchCriteria: {}
     });
 });
 
 app.post("/manageCustomers", (req, res) => {
     const { custId, firstName, lastName, state } = req.body;
-    
+
     let sql = "SELECT * FROM CUSTOMER WHERE 1=1";
     let params = [];
 
@@ -68,7 +71,7 @@ app.post("/manageCustomers", (req, res) => {
     }
     if (firstName) {
         params.push(`%${firstName}%`);
-        sql += ` AND firstName ILIKE $${params.length}`; 
+        sql += ` AND firstName ILIKE $${params.length}`;
     }
     if (lastName) {
         params.push(`%${lastName}%`);
@@ -82,7 +85,7 @@ app.post("/manageCustomers", (req, res) => {
     pool.query(sql, params, (err, result) => {
         res.render("manageCustomers", {
             model: result.rows,
-            searchCriteria: req.body, 
+            searchCriteria: req.body,
             count: result.rows.length
         });
     });
@@ -101,16 +104,16 @@ app.post("/createCustomer", (req, res) => {
 
     pool.query(sql, params, (err, result) => {
         if (err) {
-            return res.render("createCustomer", {  
-                message: `Error - ${err.message}`, 
+            return res.render("createCustomer", {
+                message: `Error - ${err.message}`,
                 nextId: custId,
-                formData: req.body 
+                formData: req.body
             });
         } else {
             res.render("createCustomer", {
                 message: "Customer successfully created!",
-                nextId: parseInt(custId) + 1, 
-                formData: {} 
+                nextId: parseInt(custId) + 1,
+                formData: {}
             });
         }
     });
@@ -120,9 +123,9 @@ app.get("/editCustomer/:id", async (req, res) => {
     const id = req.params.id;
     try {
         const result = await pool.query("SELECT * FROM CUSTOMER WHERE custId = $1", [id]);
-        res.render("editCustomer", { 
-            customer: result.rows[0], 
-            message: "" 
+        res.render("editCustomer", {
+            customer: result.rows[0],
+            message: ""
         });
     } catch (err) {
         res.status(500).send("Error loading customer");
@@ -142,14 +145,14 @@ app.post("/editCustomer/:id", async (req, res) => {
     try {
         await pool.query(sql, params);
         const result = await pool.query("SELECT * FROM CUSTOMER WHERE custId = $1", [id]);
-        res.render("editCustomer", { 
-            customer: result.rows[0], 
-            message: "Customer updated successfully!" 
+        res.render("editCustomer", {
+            customer: result.rows[0],
+            message: "Customer updated successfully!"
         });
     } catch (err) {
-        res.render("editCustomer", { 
+        res.render("editCustomer", {
             customer: req.body,
-            message: `Error updating record: ${err.message}` 
+            message: `Error updating record: ${err.message}`
         });
     }
 });
@@ -157,7 +160,7 @@ app.post("/editCustomer/:id", async (req, res) => {
 app.get("/deleteCustomer/:id", async (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM CUSTOMER WHERE custId = $1";
-    
+
     try {
         const result = await pool.query(sql, [id]);
         res.render("deleteCustomer", { customer: result.rows[0] });
@@ -169,13 +172,13 @@ app.get("/deleteCustomer/:id", async (req, res) => {
 app.post("/deleteCustomer/:id", async (req, res) => {
     const id = req.params.id;
     const sql = "DELETE FROM CUSTOMER WHERE custId = $1";
-    
+
     try {
         await pool.query(sql, [id]);
         const countResult = await pool.query("SELECT COUNT(*) FROM CUSTOMER");
         res.render("manageCustomers", {
             message: "Customer successfully deleted.",
-            model: [], 
+            model: [],
             totalRecords: countResult.rows[0].count,
             searchCriteria: {}
         });
@@ -197,9 +200,9 @@ app.post("/createCustomer", (req, res) => {
         let message = "";
         if (err) {
             message = `Error- ${err.message}`;
-            res.render("createCustomer", {  
-                message: message, 
-                nextId: custId 
+            res.render("createCustomer", {
+                message: message,
+                nextId: custId
             });
         } else {
             res.redirect("/manageCustomers");
@@ -220,10 +223,10 @@ app.post("/import", upload.single("customerFile"), async (req, res) => {
 
     for (const line of lines) {
         total++;
-        let customer = line.split(","); 
-        
+        let customer = line.split(",");
+
         const sql = "INSERT INTO CUSTOMER (custId, firstName, lastName, state, salesYTD, previousYearsSales) VALUES ($1, $2, $3, $4, $5, $6)";
-        
+
         try {
             await pool.query(sql, customer);
             success++;
@@ -233,24 +236,24 @@ app.post("/import", upload.single("customerFile"), async (req, res) => {
         }
     }
 
-    res.render("importSummary", { 
-        total, success, failed, errorDetails 
+    res.render("importSummary", {
+        total, success, failed, errorDetails
     });
 });
 
 app.post("/export", async (req, res) => {
     const fileName = req.body.filename || "export.txt";
-    
+
     const sql = "SELECT * FROM CUSTOMER ORDER BY custId";
-    
+
     try {
         const result = await pool.query(sql);
-                
+
         let output = "";
         result.rows.forEach(customer => {
             output += `${customer.custid},${customer.firstname},${customer.lastname},${customer.state},${customer.salesytd},${customer.previousyearssales}\n`;
         });
-        
+
         res.header("Content-Type", "text/plain");
         res.attachment(fileName);
         return res.send(output);
