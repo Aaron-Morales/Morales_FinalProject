@@ -27,23 +27,23 @@ const getTotalCount = async () => {
 };
 
 // Get Requests
-app.get('/', (req, res) => {
-    //res.send('Hello, World!');
-const sql = "SELECT * FROM CUSTOMER ORDER BY custId;";
-    pool.query(sql, [], (err, result) => {
-        let message = "";
-        let model = {};
-        if (err) {
-            message = `Error- ${err.message}`;
-        } else {
-            message = "success";
-            model = result.rows;
-        };
-        res.render("index", { 
-            message: message, 
-            model: model 
-        });
-    }); 
+app.get("/", (req, res) => {
+  const sql = "SELECT * FROM CUSTOMER ORDER BY custId";
+  pool.query(sql, [], (err, result) => {
+    if (err) {
+        return res.render("index", { 
+        message: "Error: " + err.message, 
+        model: [], 
+        totalRecords: 0 
+      });
+    }
+
+    res.render("index", {
+      message: "success",
+      model: result.rows,
+      totalRecords: result.rows.length 
+    });
+  });
 });
 
 app.get("/manageCustomers", async (req, res) => {

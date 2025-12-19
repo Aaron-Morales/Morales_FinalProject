@@ -3,12 +3,12 @@
     <h1>Customer List Application</h1>
     <h2>Select a Task from the Top Navigation Bar</h2>
 
-    <% if(message !=="success" ){%>
+    <% if (locals.message && message !== "success") { %>
         <h1>We Encountered an Error</h1>
         <p><%= message %></p>
-    <% } else {%>
-        <h2>Total number of records in the database: <%= model.length %>
-        </h2>
+    <% } else { %>
+        <h2>Total number of records in the database: <%= totalRecords %></h2>
+        
         <table class='table'>
             <thead class='thead-dark'>
                 <tr>
@@ -21,21 +21,18 @@
                 </tr>
             </thead>
             <tbody>
-                <% model.forEach(custID=> { %>
-                    </tr>
-                        <td><%= custID_cusId %></td>
-                        <td><%= custID_firstName %></td>
-                        <td><%= custID_lastName %></td>
-                        <td><%= custID_state %></td>
-                        <td><%= custID_salesYTD %></td>
-                        <td><%= custID_previousYearsSales %></td>   
+                <% totalRecords.forEach(customer => { %>
+                    <tr>
+                        <td><%= customer.custid %></td>
+                        <td><%= customer.firstname %></td>
+                        <td><%= customer.lastname %></td>
+                        <td><%= customer.state %></td>
+                        <td><%= customer.salesytd %></td>
+                        <td><%= customer.previousyearssales %></td>   
                     </tr>
                 <% }); %>
             </tbody>
         </table>
     <% } %>
-</body>
-
-</html>
 
 <%- include("_footer") -%>
